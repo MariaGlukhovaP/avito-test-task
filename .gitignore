@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Webpack
+/.webpack
+/build/
+
+# React
+/public/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker
+.dockerignore
+
+# IDEs
+.idea/
+.vscode/
