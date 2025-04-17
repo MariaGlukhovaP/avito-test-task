@@ -7,8 +7,8 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { useEffect, useState } from "react";
-import "./issuePage.css";
 import { fetchTasks } from "../../store/slices/issuesSlice";
+import "./issuePage.css";
 
 const IssuesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,7 +61,7 @@ const IssuesPage: React.FC = () => {
               </NavLink>
             </Button>
             <Button type="link">
-              <NavLink to="/projects">Проекты</NavLink>
+              <NavLink to="/boards">Проекты</NavLink>
             </Button>
           </div>
           <CreateTaskButton />
@@ -73,7 +73,7 @@ const IssuesPage: React.FC = () => {
       {filteredTasks && !loading && !error && (
         <TaskList tasks={filteredTasks} />
       )}
-      <TaskModal />
+      <CreateTaskButton />
     </div>
   );
 };
