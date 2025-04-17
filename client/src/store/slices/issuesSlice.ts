@@ -1,83 +1,50 @@
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-
-interface Issue {
-  id: number;
-  title: string;
-  status: string;
-  boardId: number;
-  executor: string;
-}
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { Issue } from "../../types/issue";
+import { RootState } from "../store";
 
 interface IssuesState {
-  items: Issue[];
-  status: "idle" | "loading" | "failed";
-  selectedIssueId: number | null;
-  isModalOpen: boolean;
-  filters: {
-    status: string;
-    boardId: number | null;
-    searchTitle: string;
-    searchExecutor: string;
-  };
+  tasks: Issue[];
+  loading: boolean;
+  error: string | null;
 }
 
-export const fetchIssues = createAsyncThunk<Issue[]>(
-  "issues/fetchIssues",
-  async () => {
-    const response = await fetch("http://localhost:8080/api/v1/tasks");
-    if (!response.ok) throw new Error("Ошибка при загрузке задач");
+const initialState: IssuesState = {
+  tasks: [],
+  loading: false,
+  error: null,
+};
 
-    const json = await response.json();
-    return json.data;
+export const fetchTasks = createAsyncThunk<Issue[], void>(
+  "issues/fetchTasks",
+  async () => {
+    const response = await fetch("http://127.0.0.1:8080/api/v1/tasks"); // Здесь используется запрос к API
+    const data = await response.json();
+    return data.data;
   }
 );
-
-const initialState: IssuesState = {
-  items: [],
-  status: "idle",
-  selectedIssueId: null,
-  isModalOpen: false,
-  filters: {
-    status: "",
-    boardId: null,
-    searchTitle: "",
-    searchExecutor: "",
-  },
-};
 
 const issuesSlice = createSlice({
   name: "issues",
   initialState,
-  reducers: {
-    openModal: (state, action: PayloadAction<number>) => {
-      state.selectedIssueId = action.payload;
-      state.isModalOpen = true;
-    },
-    closeModal: (state) => {
-      state.selectedIssueId = null;
-      state.isModalOpen = false;
-    },
-    setFilter: (
-      state,
-      action: PayloadAction<Partial<IssuesState["filters"]>>
-    ) => {
-      state.filters = { ...state.filters, ...action.payload };
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchIssues.pending, (state) => {
-        state.status = "loading";
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
       })
-      .addCase(fetchIssues.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.items = action.payload;
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
       })
-      .addCase(fetchIssues.rejected, (state) => {
-        state.status = "failed";
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Unknown error";
       });
   },
 });
 
-export const { openModal, closeModal, setFilter } = issuesSlice.actions;
+export const selectTasks = (state: RootState) => state.issues.tasks;
+export const selectLoading = (state: RootState) => state.issues.loading;
+export const selectError = (state: RootState) => state.issues.error;
+
 export default issuesSlice.reducer;

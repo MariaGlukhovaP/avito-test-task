@@ -1,70 +1,74 @@
-import React from "react";
 import { Select, Input } from "antd";
-import { useDispatch } from "react-redux";
-import { setFilter } from "../../store/slices/issuesSlice";
 const { Option } = Select;
+import { useState } from "react";
 import "./taskFilters.css";
+import classNames from "classnames";
 
-const TaskFilters: React.FC = () => {
-  const dispatch = useDispatch();
+const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
+  onFilterChange,
+}) => {
+  const [searchTitle, setSearchTitle] = useState("");
+  const [status, setStatus] = useState("");
+  const [boardId, setBoardId] = useState("");
+  const [assignee, setAssignee] = useState("");
 
-  const handleStatusChange = (value: string) => {
-    dispatch(setFilter({ status: value }));
-  };
-
-  const handleBoardChange = (value: string) => {
-    dispatch(setFilter({ boardId: parseInt(value) || null }));
-  };
-
-  const handleSearchTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setFilter({ searchTitle: e.target.value }));
-  };
-
-  const handleSearchExecutorChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    dispatch(setFilter({ searchExecutor: e.target.value }));
+  const handleFilterChange = () => {
+    onFilterChange({ searchTitle, status, boardId, assignee });
   };
 
   return (
-    <div className="contaier">
+    <div className="filter-container">
       <Input
-        placeholder="Поиск по названию задачи"
-        onChange={handleSearchTitleChange}
         className="search"
+        placeholder="Поиск по названию задачи"
+        value={searchTitle}
+        onChange={(e) => {
+          setSearchTitle(e.target.value);
+          handleFilterChange();
+        }}
       />
       <div className="filters-container">
         <Select
           placeholder="Выберите фильтр"
-          style={{ width: "100%" }}
           dropdownRender={(menu) => (
             <div className="sections">
-              <div className="filter-section">
-                <Select
-                  placeholder="Выберите статус"
-                  onChange={handleStatusChange}
-                >
-                  <Option value="">Все статусы</Option>
-                  <Option value="open">Открыта</Option>
-                  <Option value="in_progress">В процессе</Option>
-                  <Option value="closed">Закрыта</Option>
-                </Select>
-              </div>
-              <div className="filter-section">
-                <Select
-                  placeholder="Выберите доску"
-                  style={{ width: "100%" }}
-                  onChange={handleBoardChange}
-                >
-                  <Option value="">Все доски</Option>
-                </Select>
-              </div>
-              <div className="filter-section">
-                <Input
-                  placeholder="Поиск по исполнителю"
-                  onChange={handleSearchExecutorChange}
-                />
-              </div>
+              <Select
+                placeholder="Выберите статус"
+                value={status}
+                onChange={(value) => {
+                  setStatus(value);
+                  handleFilterChange();
+                }}
+              >
+                <Option value="">Все статусы</Option>
+                <Option value="open">Открыта</Option>
+                <Option value="in_progress">В процессе</Option>
+                <Option value="closed">Закрыта</Option>
+              </Select>
+              <Select
+                placeholder="Выберите доску"
+                value={boardId}
+                onChange={(value) => {
+                  setBoardId(value);
+                  handleFilterChange();
+                }}
+              >
+                <Option value="">Все доски</Option>
+                <Option value="1">1</Option>
+                <Option value="2">2</Option>
+                <Option value="3">3</Option>
+                <Option value="4">4</Option>
+                <Option value="5">5</Option>
+                <Option value="6">6</Option>
+              </Select>
+              <Input
+                placeholder="Поиск по исполнителю"
+                value={assignee}
+                onChange={(e) => {
+                  setAssignee(e.target.value);
+                  handleFilterChange();
+                }}
+              />
               {menu}
             </div>
           )}

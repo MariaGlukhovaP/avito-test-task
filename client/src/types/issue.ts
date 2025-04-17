@@ -1,7 +1,17 @@
+interface Assignee {
+  id: number;
+  fullName: string;
+  email: string;
+  avatarUrl: string;
+}
+
 export interface Issue {
   id: number;
   title: string;
-  status: string;
+  description: string;
+  priority: "Low" | "Medium" | "High";
+  status: "ToDo" | "InProgress" | "Done";
+  assignee: Assignee;
   boardId: number;
-  executor: string;
+  boardName: string;
 }

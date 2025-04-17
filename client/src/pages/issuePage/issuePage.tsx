@@ -4,11 +4,48 @@ import TaskFilters from "../../components/taskFilters/taskFilters";
 import TaskList from "../../components/taskList/taskList";
 import TaskModal from "../../components/taskModal/taskModal";
 import { NavLink } from "react-router-dom";
-import { useIssuesQuery } from "../../services/issues";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../store/store";
+import { useEffect, useState } from "react";
 import "./issuePage.css";
+import { fetchTasks } from "../../store/slices/issuesSlice";
 
 const IssuesPage: React.FC = () => {
-  const { data, isLoading, isError, error } = useIssuesQuery();
+  const dispatch = useDispatch<AppDispatch>();
+  const { tasks, loading, error } = useSelector(
+    (state: RootState) => state.issues
+  );
+  const [filters, setFilters] = useState({
+    searchTitle: "",
+    status: "",
+    boardId: "",
+    assignee: "",
+  });
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
+
+  const handleFilterChange = (filters: any) => {
+    setFilters(filters);
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesTitle =
+      task.title.toLowerCase().includes(filters.searchTitle.toLowerCase()) ||
+      !filters.searchTitle;
+    const matchesStatus =
+      task.status.toLowerCase().includes(filters.status.toLowerCase()) ||
+      !filters.status;
+    const matchesBoardId =
+      task.boardId.toString() === filters.boardId || !filters.boardId;
+    const matchesAssignee =
+      task.assignee.fullName
+        .toLowerCase()
+        .includes(filters.assignee.toLowerCase()) || !filters.assignee;
+
+    return matchesTitle && matchesStatus && matchesBoardId && matchesAssignee;
+  });
 
   return (
     <div className="container">
@@ -30,10 +67,12 @@ const IssuesPage: React.FC = () => {
           <CreateTaskButton />
         </div>
       </header>
-      <TaskFilters />
-      {isLoading && <p>Загрузка...</p>}
-      {isError && <p>Ошибка: {(error as Error).message}</p>}
-      {data && <TaskList tasks={data} />}
+      <TaskFilters onFilterChange={handleFilterChange} />
+      {loading && <p>Загрузка...</p>}
+      {error && <p>Ошибка: {error}</p>}
+      {filteredTasks && !loading && !error && (
+        <TaskList tasks={filteredTasks} />
+      )}
       <TaskModal />
     </div>
   );
