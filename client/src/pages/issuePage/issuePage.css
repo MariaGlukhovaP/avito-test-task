@@ -1,0 +1,15 @@
+.container {
+  margin: 50px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.active-link {
+  font-weight: 600;
+}

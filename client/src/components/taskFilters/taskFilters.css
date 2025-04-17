@@ -1,0 +1,16 @@
+.contaier {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.search,
+.filters-container {
+  width: 200px;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
