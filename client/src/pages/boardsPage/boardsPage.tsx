@@ -4,6 +4,7 @@ import CreateTaskButton from "../../components/createTaskBtn/createTaskBtn";
 import { useEffect, useState } from "react";
 import { Board } from "../../types/board";
 import BoardList from "../../components/boardList/boardList";
+import Header from "../../components/header/header";
 
 const fetchBoards = async () => {
   const response = await fetch("http://localhost:8080/api/v1/boards");
@@ -32,24 +33,7 @@ const BoardsPage: React.FC = () => {
 
   return (
     <div className="container">
-      <header className="header">
-        <div className="header-container">
-          <div>
-            <Button type="link">
-              <NavLink to="/issues">Все задачи</NavLink>
-            </Button>
-            <Button type="link">
-              <NavLink
-                to="/boards"
-                className={({ isActive }) => (isActive ? "active-link" : "")}
-              >
-                Проекты
-              </NavLink>
-            </Button>
-          </div>
-          <CreateTaskButton />
-        </div>
-      </header>
+      <Header />
       {loading && <p>Загрузка...</p>}
       {error && <p>Ошибка: {error}</p>}
       {!loading && !error && <BoardList boards={boards} />}

@@ -2,13 +2,13 @@ import { Button } from "antd";
 import CreateTaskButton from "../../components/createTaskBtn/createTaskBtn";
 import TaskFilters from "../../components/taskFilters/taskFilters";
 import TaskList from "../../components/taskList/taskList";
-import TaskModal from "../../components/taskModal/taskModal";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { useEffect, useState } from "react";
 import { fetchTasks } from "../../store/slices/issuesSlice";
 import "./issuePage.css";
+import Header from "../../components/header/header";
 
 const IssuesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,24 +49,7 @@ const IssuesPage: React.FC = () => {
 
   return (
     <div className="container">
-      <header className="header">
-        <div className="header-container">
-          <div>
-            <Button type="link">
-              <NavLink
-                to="/issues"
-                className={({ isActive }) => (isActive ? "active-link" : "")}
-              >
-                Все задачи
-              </NavLink>
-            </Button>
-            <Button type="link">
-              <NavLink to="/boards">Проекты</NavLink>
-            </Button>
-          </div>
-          <CreateTaskButton />
-        </div>
-      </header>
+      <Header />
       <TaskFilters onFilterChange={handleFilterChange} />
       {loading && <p>Загрузка...</p>}
       {error && <p>Ошибка: {error}</p>}
