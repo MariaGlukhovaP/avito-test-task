@@ -4,21 +4,24 @@ import { Link } from "react-router-dom";
 
 interface TaskCardProps {
   task: Issue;
+  onClick?: () => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
   return (
     <Card
       key={task.id}
       title={task.title}
       extra={<Link to={`/board/${task.boardId}`}>Перейти к доске</Link>}
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
     >
       <p>{task.description}</p>
       <p>
         <strong>Статус:</strong> <Tag>{task.status}</Tag>
       </p>
       <p>
-        <strong>Приоритет:</strong>{" "}
+        <strong>Приоритет:</strong>
         <Tag
           color={
             task.priority === "High"
@@ -32,7 +35,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         </Tag>
       </p>
       <p>
-        <strong>Исполнитель:</strong>{" "}
+        <strong>Исполнитель:</strong>
         <span>
           <Avatar src={task.assignee.avatarUrl} size="small" />
           {task.assignee.fullName}

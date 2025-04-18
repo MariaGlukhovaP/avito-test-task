@@ -1,43 +1,40 @@
-import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import BoardColumn from "../../components/boardColumn/boardColumn";
-import {
-  fetchTasks,
-  selectTasks,
-  selectLoading,
-} from "../../store/slices/issuesSlice";
+import { useEffect, useMemo, useState } from "react";
 import { Issue } from "../../types/issue";
-import { Board } from "../../types/board";
-import { AppDispatch } from "../../store/store";
+import BoardColumn from "../../components/boardColumn/boardColumn";
 import Header from "../../components/header/header";
+import { Board } from "../../types/board";
+import { useBoards } from "../../services/useBoards";
+import { useTasks } from "../../services/useIssues";
 import "./boardPage.css";
 
 const BoardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const dispatch = useDispatch<AppDispatch>();
 
-  const tasks = useSelector(selectTasks);
-  const loading = useSelector(selectLoading);
+  if (!id) {
+    return <p>Ошибка: ID доски не найдено</p>;
+  }
+
+  const {
+    data: boards = [],
+    isLoading: isBoardsLoading,
+    isError: isBoardsError,
+  } = useBoards();
+
+  const {
+    data: tasks = [],
+    isLoading: isTasksLoading,
+    isError: isTasksError,
+  } = useTasks();
+
   const [board, setBoard] = useState<Board | null>(null);
 
   useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const fetchBoard = async () => {
-      try {
-        const res = await fetch(`http://localhost:8080/api/v1/boards/${id}`);
-        const data = await res.json();
-        setBoard(data);
-      } catch (error) {
-        console.error("Ошибка загрузки доски", error);
-      }
-    };
-
-    fetchBoard();
-  }, [id]);
+    const foundBoard = boards.find((board) => board.id.toString() === id);
+    if (foundBoard) {
+      setBoard(foundBoard);
+    }
+  }, [id, boards]);
 
   const boardTasks = useMemo(() => {
     return tasks.filter((task: Issue) => task.boardId === Number(id));
@@ -52,8 +49,9 @@ const BoardPage: React.FC = () => {
   return (
     <div className="container">
       <Header />
-      {loading && <p>Загрузка...</p>}
-      {!loading && board && (
+      {(isBoardsLoading || isTasksLoading) && <p>Загрузка...</p>}
+      {(isBoardsError || isTasksError) && <p>Ошибка при загрузке данных</p>}
+      {board && !isBoardsLoading && !isTasksLoading && (
         <>
           <h2 className="board-title">{board.name}</h2>
           <div className="board-columns">
@@ -75,6 +73,7 @@ const BoardPage: React.FC = () => {
           </div>
         </>
       )}
+      {!board && !isBoardsLoading && !isTasksLoading && <p>Доска не найдена</p>}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import IssuesPage from "./pages/issuePage/issuePage";
+import IssuesPage from "./pages/issuesPage/issuesPage";
 import BoardsPage from "./pages/boardsPage/boardsPage";
 import BoardPage from "./pages/boardPage/boardPage";
 

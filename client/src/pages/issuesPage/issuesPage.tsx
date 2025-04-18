@@ -1,20 +1,14 @@
-import { Button } from "antd";
-import CreateTaskButton from "../../components/createTaskBtn/createTaskBtn";
+import { useState } from "react";
+import { Issue } from "../../types/issue";
 import TaskFilters from "../../components/taskFilters/taskFilters";
 import TaskList from "../../components/taskList/taskList";
-import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../store/store";
-import { useEffect, useState } from "react";
-import { fetchTasks } from "../../store/slices/issuesSlice";
-import "./issuePage.css";
 import Header from "../../components/header/header";
+import { useTasks } from "../../services/useIssues";
+import "./issuesPage.css";
 
 const IssuesPage: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { tasks, loading, error } = useSelector(
-    (state: RootState) => state.issues
-  );
+  const { data: tasks = [], isLoading, isError, error } = useTasks();
+
   const [filters, setFilters] = useState({
     searchTitle: "",
     status: "",
@@ -22,15 +16,11 @@ const IssuesPage: React.FC = () => {
     assignee: "",
   });
 
-  useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
-
-  const handleFilterChange = (filters: any) => {
-    setFilters(filters);
+  const handleFilterChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
   };
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks: Issue[] = tasks.filter((task) => {
     const matchesTitle =
       task.title.toLowerCase().includes(filters.searchTitle.toLowerCase()) ||
       !filters.searchTitle;
@@ -51,12 +41,9 @@ const IssuesPage: React.FC = () => {
     <div className="container">
       <Header />
       <TaskFilters onFilterChange={handleFilterChange} />
-      {loading && <p>Загрузка...</p>}
-      {error && <p>Ошибка: {error}</p>}
-      {filteredTasks && !loading && !error && (
-        <TaskList tasks={filteredTasks} />
-      )}
-      <CreateTaskButton />
+      {isLoading && <p>Загрузка...</p>}
+      {isError && <p>Ошибка: {(error as Error).message}</p>}
+      {!isLoading && !isError && <TaskList tasks={filteredTasks} />}
     </div>
   );
 };

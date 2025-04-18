@@ -1,8 +1,9 @@
-import { Select, Input } from "antd";
+import { Select, Input, Spin } from "antd";
 const { Option } = Select;
 import { useState } from "react";
+
+import { useBoards } from "../../services/useBoards";
 import "./taskFilters.css";
-import classNames from "classnames";
 
 const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
   onFilterChange,
@@ -11,6 +12,8 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
   const [status, setStatus] = useState("");
   const [boardId, setBoardId] = useState("");
   const [assignee, setAssignee] = useState("");
+
+  const { data: boards = [], isLoading: boardsLoading } = useBoards();
 
   const handleFilterChange = () => {
     onFilterChange({ searchTitle, status, boardId, assignee });
@@ -41,9 +44,9 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
                 }}
               >
                 <Option value="">Все статусы</Option>
-                <Option value="open">Открыта</Option>
-                <Option value="in_progress">В процессе</Option>
-                <Option value="closed">Закрыта</Option>
+                <Option value="open">To do</Option>
+                <Option value="in_progress">In Progress</Option>
+                <Option value="closed">Done</Option>
               </Select>
               <Select
                 placeholder="Выберите доску"
@@ -52,14 +55,14 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
                   setBoardId(value);
                   handleFilterChange();
                 }}
+                loading={boardsLoading}
               >
                 <Option value="">Все доски</Option>
-                <Option value="1">1</Option>
-                <Option value="2">2</Option>
-                <Option value="3">3</Option>
-                <Option value="4">4</Option>
-                <Option value="5">5</Option>
-                <Option value="6">6</Option>
+                {boards.map((board) => (
+                  <Option key={board.id} value={String(board.id)}>
+                    {board.name}
+                  </Option>
+                ))}
               </Select>
               <Input
                 placeholder="Поиск по исполнителю"
@@ -72,7 +75,7 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
               {menu}
             </div>
           )}
-        ></Select>
+        />
       </div>
     </div>
   );

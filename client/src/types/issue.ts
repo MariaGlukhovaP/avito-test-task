@@ -1,9 +1,4 @@
-interface Assignee {
-  id: number;
-  fullName: string;
-  email: string;
-  avatarUrl: string;
-}
+import { User } from "./user";
 
 export interface Issue {
   id: number;
@@ -11,7 +6,7 @@ export interface Issue {
   description: string;
   priority: "Low" | "Medium" | "High";
   status: "ToDo" | "InProgress" | "Done";
-  assignee: Assignee;
+  assignee: User;
   boardId: number;
   boardName: string;
 }
