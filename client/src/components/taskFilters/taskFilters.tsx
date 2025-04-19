@@ -1,22 +1,31 @@
 import { Select, Input, Spin } from "antd";
 const { Option } = Select;
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { useBoards } from "../../services/useBoards";
 import "./taskFilters.css";
+import { Filters } from "../../types/filters";
 
-const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
+const TaskFilters: React.FC<{ onFilterChange: (filters: Filters) => void }> = ({
   onFilterChange,
 }) => {
-  const [searchTitle, setSearchTitle] = useState("");
-  const [status, setStatus] = useState("");
-  const [boardId, setBoardId] = useState("");
-  const [assignee, setAssignee] = useState("");
+  const [filters, setFilters] = useState<Filters>({
+    searchTitle: "",
+    status: "",
+    boardId: "",
+    assignee: "",
+  });
 
   const { data: boards = [], isLoading: boardsLoading } = useBoards();
 
-  const handleFilterChange = () => {
-    onFilterChange({ searchTitle, status, boardId, assignee });
+  useEffect(() => {
+    onFilterChange(filters);
+  }, [filters, onFilterChange]);
+
+  const handleChange = (field: keyof Filters, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   return (
@@ -24,11 +33,8 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
       <Input
         className="search"
         placeholder="Поиск по названию задачи"
-        value={searchTitle}
-        onChange={(e) => {
-          setSearchTitle(e.target.value);
-          handleFilterChange();
-        }}
+        value={filters.searchTitle}
+        onChange={(e) => handleChange("searchTitle", e.target.value)}
       />
       <div className="filters-container">
         <Select
@@ -37,24 +43,19 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
             <div className="sections">
               <Select
                 placeholder="Выберите статус"
-                value={status}
-                onChange={(value) => {
-                  setStatus(value);
-                  handleFilterChange();
-                }}
+                value={filters.status}
+                onChange={(value) => handleChange("status", value)}
               >
                 <Option value="">Все статусы</Option>
-                <Option value="open">To do</Option>
-                <Option value="in_progress">In Progress</Option>
-                <Option value="closed">Done</Option>
+                <Option value="Open">To do</Option>
+                <Option value="InProgress">In Progress</Option>
+                <Option value="Closed">Done</Option>
+                <Option value="Backlog">Backlog</Option>
               </Select>
               <Select
                 placeholder="Выберите доску"
-                value={boardId}
-                onChange={(value) => {
-                  setBoardId(value);
-                  handleFilterChange();
-                }}
+                value={filters.boardId}
+                onChange={(value) => handleChange("boardId", value)}
                 loading={boardsLoading}
               >
                 <Option value="">Все доски</Option>
@@ -66,11 +67,8 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: any) => void }> = ({
               </Select>
               <Input
                 placeholder="Поиск по исполнителю"
-                value={assignee}
-                onChange={(e) => {
-                  setAssignee(e.target.value);
-                  handleFilterChange();
-                }}
+                value={filters.assignee}
+                onChange={(e) => handleChange("assignee", e.target.value)}
               />
               {menu}
             </div>

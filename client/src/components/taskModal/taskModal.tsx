@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, Button, Spin } from "antd";
+import { Modal, Form, Input, Select, Button } from "antd";
 import { Issue } from "../../types/issue";
 import { useBoards } from "../../services/useBoards";
 import { useUsers } from "../../services/useUsers";
+import { useCreateTask, useUpdateTask } from "../../services/useMutateTask";
+import { useLocation, NavLink } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -10,17 +12,26 @@ interface CreateTaskModalProps {
   visible: boolean;
   onClose: () => void;
   task?: Issue;
+  boardName?: string;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   visible,
   onClose,
   task,
+  boardName,
 }) => {
   const [form] = Form.useForm();
+  const location = useLocation();
+  const isIssuesPage = location.pathname === "/issues";
 
   const { data: boards = [], isLoading: boardsLoading } = useBoards();
   const { data: users = [], isLoading: usersLoading } = useUsers();
+
+  const { mutate: createTask, isPending: creating } = useCreateTask();
+  const { mutate: updateTask, isPending: updating } = useUpdateTask(
+    task?.id ?? 0
+  );
 
   useEffect(() => {
     if (task) {
@@ -38,12 +49,32 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   }, [task, form]);
 
   const handleSave = (values: any) => {
+    const payload = {
+      ...values,
+      assigneeId: values.assignee,
+    };
+
     if (task) {
-      console.log("Обновить задачу", values);
+      updateTask(payload, {
+        onSuccess: () => {
+          form.resetFields();
+          onClose();
+        },
+        onError: (error) => {
+          console.error("Ошибка обновления:", error);
+        },
+      });
     } else {
-      console.log("Создать новую задачу", values);
+      createTask(payload, {
+        onSuccess: () => {
+          form.resetFields();
+          onClose();
+        },
+        onError: (error) => {
+          console.error("Ошибка создания:", error);
+        },
+      });
     }
-    onClose();
   };
 
   return (
@@ -61,6 +92,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         >
           <Input placeholder="Введите название задачи" />
         </Form.Item>
+
         <Form.Item
           label="Описание"
           name="description"
@@ -68,6 +100,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         >
           <Input.TextArea placeholder="Введите описание задачи" />
         </Form.Item>
+
+        {boardName && (
+          <Form.Item label="Доска" name="boardName">
+            <Input value={boardName} disabled />
+          </Form.Item>
+        )}
 
         <Form.Item
           label="Проект"
@@ -86,6 +124,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             ))}
           </Select>
         </Form.Item>
+
         <Form.Item
           label="Приоритет"
           name="priority"
@@ -107,6 +146,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             <Option value="open">To do</Option>
             <Option value="in_progress">In Progress</Option>
             <Option value="closed">Done</Option>
+            <Option value="backlog">Backlog</Option>
           </Select>
         </Form.Item>
 
@@ -127,11 +167,31 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             ))}
           </Select>
         </Form.Item>
+
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            loading={creating || updating}
+          >
             {task ? "Обновить задачу" : "Создать задачу"}
           </Button>
         </Form.Item>
+
+        {isIssuesPage && task?.boardId && (
+          <Form.Item>
+            <NavLink
+              to={`/board/${task.boardId}`}
+              onClick={onClose}
+              style={{ display: "block" }}
+            >
+              <Button type="default" block>
+                Перейти на доску
+              </Button>
+            </NavLink>
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

@@ -48,7 +48,7 @@ const BoardPage: React.FC = () => {
 
   return (
     <div className="container">
-      <Header />
+      <Header boardName={board?.name} />
       {(isBoardsLoading || isTasksLoading) && <p>Загрузка...</p>}
       {(isBoardsError || isTasksError) && <p>Ошибка при загрузке данных</p>}
       {board && !isBoardsLoading && !isTasksLoading && (

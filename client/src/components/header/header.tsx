@@ -3,7 +3,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import CreateTaskModal from "../taskModal/taskModal";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  boardName?: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ boardName }) => {
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -40,13 +44,16 @@ const Header: React.FC = () => {
               Проекты
             </NavLink>
           </Button>
-          <Button type="primary" onClick={showModal}>
-            Создать задачу
-          </Button>
         </div>
+        <Button type="primary" onClick={showModal}>
+          Создать задачу
+        </Button>
+        <CreateTaskModal
+          visible={isModalVisible}
+          onClose={handleCancel}
+          boardName={boardName}
+        />
       </div>
-
-      <CreateTaskModal visible={isModalVisible} onClose={handleCancel} />
     </header>
   );
 };
