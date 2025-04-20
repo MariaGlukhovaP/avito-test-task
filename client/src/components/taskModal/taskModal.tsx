@@ -5,6 +5,8 @@ import { useBoards } from "../../services/useBoards";
 import { useUsers } from "../../services/useUsers";
 import { useCreateTask, useUpdateTask } from "../../services/useMutateTask";
 import { useLocation, NavLink } from "react-router-dom";
+import { useUpdateTaskStatus } from "../../services/useUpdateTaskStatus";
+import "./taskModal.css";
 
 const { Option } = Select;
 
@@ -13,6 +15,7 @@ interface CreateTaskModalProps {
   onClose: () => void;
   task?: Issue;
   boardName?: string;
+  boardId?: number;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
@@ -20,6 +23,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   task,
   boardName,
+  boardId,
 }) => {
   const [form] = Form.useForm();
   const location = useLocation();
@@ -48,22 +52,45 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     }
   }, [task, form]);
 
+  const { mutate: updateTaskStatus } = useUpdateTaskStatus(task?.id ?? 0);
+
   const handleSave = (values: any) => {
     const payload = {
       ...values,
       assigneeId: values.assignee,
     };
 
+    const isOnlyStatusChanged =
+      task &&
+      values.status !== task.status &&
+      values.title === task.title &&
+      values.description === task.description &&
+      values.boardId === task.boardId &&
+      values.priority === task.priority &&
+      values.assignee === task.assignee?.id;
+
     if (task) {
-      updateTask(payload, {
-        onSuccess: () => {
-          form.resetFields();
-          onClose();
-        },
-        onError: (error) => {
-          console.error("Ошибка обновления:", error);
-        },
-      });
+      if (isOnlyStatusChanged) {
+        updateTaskStatus(values.status, {
+          onSuccess: () => {
+            form.resetFields();
+            onClose();
+          },
+          onError: (error) => {
+            console.error("Ошибка обновления статуса:", error);
+          },
+        });
+      } else {
+        updateTask(payload, {
+          onSuccess: () => {
+            form.resetFields();
+            onClose();
+          },
+          onError: (error) => {
+            console.error("Ошибка обновления:", error);
+          },
+        });
+      }
     } else {
       createTask(payload, {
         onSuccess: () => {
@@ -101,29 +128,29 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <Input.TextArea placeholder="Введите описание задачи" />
         </Form.Item>
 
-        {boardName && (
-          <Form.Item label="Доска" name="boardName">
+        {boardName && boardId ? (
+          <Form.Item label="Доска" name="boardId" initialValue={boardName}>
             <Input value={boardName} disabled />
           </Form.Item>
-        )}
-
-        <Form.Item
-          label="Проект"
-          name="boardId"
-          rules={[{ required: true, message: "Выберите проект" }]}
-        >
-          <Select
-            placeholder="Выберите проект"
-            loading={boardsLoading}
-            disabled={boardsLoading}
+        ) : (
+          <Form.Item
+            label="Проект"
+            name="boardId"
+            rules={[{ required: true, message: "Выберите проект" }]}
           >
-            {boards.map((board) => (
-              <Option key={board.id} value={board.id}>
-                {board.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select
+              placeholder="Выберите проект"
+              loading={boardsLoading}
+              disabled={boardsLoading}
+            >
+              {boards.map((board) => (
+                <Option key={board.id} value={board.id}>
+                  {board.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Form.Item
           label="Приоритет"
@@ -143,10 +170,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           rules={[{ required: true, message: "Выберите статус" }]}
         >
           <Select placeholder="Выберите статус">
-            <Option value="open">To do</Option>
-            <Option value="in_progress">In Progress</Option>
-            <Option value="closed">Done</Option>
-            <Option value="backlog">Backlog</Option>
+            <Option value="ToDo">To do</Option>
+            <Option value="InProgress">In progress</Option>
+            <Option value="Done">Done</Option>
+            <Option value="Backlog">Backlog</Option>
           </Select>
         </Form.Item>
 
@@ -168,30 +195,27 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </Select>
         </Form.Item>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            loading={creating || updating}
-          >
-            {task ? "Обновить задачу" : "Создать задачу"}
-          </Button>
-        </Form.Item>
-
-        {isIssuesPage && task?.boardId && (
+        <div className="buttonsContainer">
+          {isIssuesPage && task?.boardId && (
+            <Form.Item>
+              <NavLink to={`/board/${task.boardId}`} onClick={onClose}>
+                <Button type="default" block>
+                  Перейти на доску
+                </Button>
+              </NavLink>
+            </Form.Item>
+          )}
           <Form.Item>
-            <NavLink
-              to={`/board/${task.boardId}`}
-              onClick={onClose}
-              style={{ display: "block" }}
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={creating || updating}
             >
-              <Button type="default" block>
-                Перейти на доску
-              </Button>
-            </NavLink>
+              {task ? "Обновить задачу" : "Создать задачу"}
+            </Button>
           </Form.Item>
-        )}
+        </div>
       </Form>
     </Modal>
   );

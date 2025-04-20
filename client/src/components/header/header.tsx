@@ -5,9 +5,10 @@ import CreateTaskModal from "../taskModal/taskModal";
 
 interface HeaderProps {
   boardName?: string;
+  boardId?: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ boardName }) => {
+const Header: React.FC<HeaderProps> = ({ boardName, boardId }) => {
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -52,6 +53,7 @@ const Header: React.FC<HeaderProps> = ({ boardName }) => {
           visible={isModalVisible}
           onClose={handleCancel}
           boardName={boardName}
+          boardId={boardId}
         />
       </div>
     </header>

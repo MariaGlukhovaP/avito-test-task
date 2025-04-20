@@ -49,7 +49,7 @@ const TaskFilters: React.FC<{ onFilterChange: (filters: Filters) => void }> = ({
                 <Option value="">Все статусы</Option>
                 <Option value="Open">To do</Option>
                 <Option value="InProgress">In Progress</Option>
-                <Option value="Closed">Done</Option>
+                <Option value="Done">Done</Option>
                 <Option value="Backlog">Backlog</Option>
               </Select>
               <Select

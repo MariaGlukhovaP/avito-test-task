@@ -2,11 +2,11 @@ import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { Issue } from "../../types/issue";
 import BoardColumn from "../../components/boardColumn/boardColumn";
-import Header from "../../components/header/header";
 import { Board } from "../../types/board";
 import { useBoards } from "../../services/useBoards";
 import { useTasks } from "../../services/useIssues";
 import "./boardPage.css";
+import Header from "../../components/header/header";
 
 const BoardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +48,7 @@ const BoardPage: React.FC = () => {
 
   return (
     <div className="container">
-      <Header boardName={board?.name} />
+      <Header boardName={board?.name} boardId={board?.id} />
       {(isBoardsLoading || isTasksLoading) && <p>Загрузка...</p>}
       {(isBoardsError || isTasksError) && <p>Ошибка при загрузке данных</p>}
       {board && !isBoardsLoading && !isTasksLoading && (
