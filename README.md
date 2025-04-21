@@ -1,5 +1,5 @@
 # Project Manager App
-тестовое задание Frontend
+Тестовое задание Frontend-разработчик Авито
 
 ![Preview](capture_20250421200909795.bmp)
 
