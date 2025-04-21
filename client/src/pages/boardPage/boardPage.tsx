@@ -1,59 +1,51 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
-import { Issue } from "../../types/issue";
+import { useMemo } from "react";
 import BoardColumn from "../../components/boardColumn/boardColumn";
-import { Board } from "../../types/board";
-import { useBoards } from "../../services/useBoards";
-import { useTasks } from "../../services/useIssues";
 import "./boardPage.css";
 import Header from "../../components/header/header";
+import { useBoard } from "../../services/useBoard";
+import { useBoards } from "../../services/useBoards";
 
 const BoardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
-  if (!id) {
-    return <p>Ошибка: ID доски не найдено</p>;
-  }
+  if (!id) return <p>Ошибка: ID доски не найдено</p>;
 
   const {
-    data: boards = [],
+    data: boards,
     isLoading: isBoardsLoading,
     isError: isBoardsError,
   } = useBoards();
 
   const {
-    data: tasks = [],
+    data: boardTasks = [],
     isLoading: isTasksLoading,
     isError: isTasksError,
-  } = useTasks();
+  } = useBoard(id);
+  console.log(boardTasks);
 
-  const [board, setBoard] = useState<Board | null>(null);
+  const currentBoard = useMemo(() => {
+    return boards?.find((b) => b.id === Number(id));
+  }, [boards, id]);
 
-  useEffect(() => {
-    const foundBoard = boards.find((board) => board.id.toString() === id);
-    if (foundBoard) {
-      setBoard(foundBoard);
-    }
-  }, [id, boards]);
-
-  const boardTasks = useMemo(() => {
-    return tasks.filter((task: Issue) => task.boardId === Number(id));
-  }, [tasks, id]);
-
-  const groupedTasks = {
-    todo: boardTasks.filter((task) => task.status === "ToDo"),
-    inProgress: boardTasks.filter((task) => task.status === "InProgress"),
-    done: boardTasks.filter((task) => task.status === "Done"),
-  };
+  const groupedTasks = useMemo(() => {
+    return {
+      todo: boardTasks.filter((task) => task.status === "Backlog"),
+      inProgress: boardTasks.filter((task) => task.status === "InProgress"),
+      done: boardTasks.filter((task) => task.status === "Done"),
+    };
+  }, [boardTasks]);
 
   return (
     <div className="container">
-      <Header boardName={board?.name} boardId={board?.id} />
+      <Header boardName={currentBoard?.name} boardId={currentBoard?.id} />
+
       {(isBoardsLoading || isTasksLoading) && <p>Загрузка...</p>}
       {(isBoardsError || isTasksError) && <p>Ошибка при загрузке данных</p>}
-      {board && !isBoardsLoading && !isTasksLoading && (
+
+      {currentBoard && !isBoardsLoading && !isTasksLoading && (
         <>
-          <h2 className="board-title">{board.name}</h2>
+          <h2 className="board-title">{currentBoard.name}</h2>
           <div className="board-columns">
             <BoardColumn
               title="To do"
@@ -73,7 +65,10 @@ const BoardPage: React.FC = () => {
           </div>
         </>
       )}
-      {!board && !isBoardsLoading && !isTasksLoading && <p>Доска не найдена</p>}
+
+      {!currentBoard && !isBoardsLoading && !isTasksLoading && (
+        <p>Доска не найдена</p>
+      )}
     </div>
   );
 };

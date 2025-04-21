@@ -1,6 +1,6 @@
 import { Card, Tag, Avatar } from "antd";
 import { Issue } from "../../types/issue";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface TaskCardProps {
   task: Issue;
@@ -8,11 +8,18 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+  const location = useLocation();
+  const isOnBoardPage = /^\/board\/\d+$/.test(location.pathname);
+
   return (
     <Card
       key={task.id}
       title={task.title}
-      extra={<Link to={`/board/${task.boardId}`}>Перейти к доске</Link>}
+      extra={
+        !isOnBoardPage && (
+          <Link to={`/board/${task.boardId}`}>Перейти к доске</Link>
+        )
+      }
       onClick={onClick}
       style={{ cursor: "pointer" }}
     >
@@ -37,13 +44,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
       <p>
         <strong>Исполнитель:</strong>
         <span>
-          <Avatar src={task.assignee.avatarUrl} size="small" />
+          <Avatar src={task.assignee.avatarUrl} size="small" />{" "}
           {task.assignee.fullName}
         </span>
       </p>
-      <p>
-        <strong>Доска:</strong> {task.boardName}
-      </p>
+      {task.boardName && (
+        <p>
+          <strong>Доска:</strong> {task.boardName}
+        </p>
+      )}
     </Card>
   );
 };

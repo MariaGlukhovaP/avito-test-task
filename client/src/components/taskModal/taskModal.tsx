@@ -6,6 +6,7 @@ import { useUsers } from "../../services/useUsers";
 import { useCreateTask, useUpdateTask } from "../../services/useMutateTask";
 import { useLocation, NavLink } from "react-router-dom";
 import { useUpdateTaskStatus } from "../../services/useUpdateTaskStatus";
+import { useQueryClient } from "@tanstack/react-query";
 import "./taskModal.css";
 
 const { Option } = Select;
@@ -25,6 +26,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   boardName,
   boardId,
 }) => {
+  const queryClient = useQueryClient();
+  queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
   const [form] = Form.useForm();
   const location = useLocation();
   const isIssuesPage = location.pathname === "/issues";
@@ -37,7 +41,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     task?.id ?? 0
   );
 
+  const { mutate: updateTaskStatus } = useUpdateTaskStatus(task?.id ?? 0);
+
   useEffect(() => {
+    if (!visible) return;
     if (task) {
       form.setFieldsValue({
         title: task.title,
@@ -51,8 +58,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       form.resetFields();
     }
   }, [task, form]);
-
-  const { mutate: updateTaskStatus } = useUpdateTaskStatus(task?.id ?? 0);
 
   const handleSave = (values: any) => {
     const payload = {
@@ -129,9 +134,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         </Form.Item>
 
         {boardName && boardId ? (
-          <Form.Item label="Доска" name="boardId" initialValue={boardName}>
-            <Input value={boardName} disabled />
-          </Form.Item>
+          <>
+            <Form.Item name="boardId" initialValue={boardId} hidden>
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Проект">
+              <Input value={boardName} disabled />
+            </Form.Item>
+          </>
         ) : (
           <Form.Item
             label="Проект"
@@ -170,10 +181,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           rules={[{ required: true, message: "Выберите статус" }]}
         >
           <Select placeholder="Выберите статус">
-            <Option value="ToDo">To do</Option>
+            <Option value="Backlog">To do</Option>
             <Option value="InProgress">In progress</Option>
             <Option value="Done">Done</Option>
-            <Option value="Backlog">Backlog</Option>
           </Select>
         </Form.Item>
 

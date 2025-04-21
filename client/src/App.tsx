@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import "@ant-design/v5-patch-for-react-19";
 import IssuesPage from "./pages/issuesPage/issuesPage";
 import BoardsPage from "./pages/boardsPage/boardsPage";
 import BoardPage from "./pages/boardPage/boardPage";
