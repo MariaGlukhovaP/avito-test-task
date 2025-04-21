@@ -35,9 +35,21 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     String(boardId)
   );
 
+  // Функция для сохранения данных формы в localStorage
+  const saveFormDataToLocalStorage = (values: any) => {
+    localStorage.setItem("taskFormData", JSON.stringify(values));
+  };
+
+  // Функция для получения данных формы из localStorage
+  const getFormDataFromLocalStorage = () => {
+    const storedData = localStorage.getItem("taskFormData");
+    return storedData ? JSON.parse(storedData) : null;
+  };
+
   // Заполняем форму значениями при открытии модального окна для редактирования
   useEffect(() => {
     if (!visible) return;
+
     if (task) {
       form.setFieldsValue({
         title: task.title,
@@ -48,9 +60,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         assignee: task.assignee?.id,
       });
     } else {
-      form.resetFields();
+      const savedData = getFormDataFromLocalStorage();
+      if (savedData) {
+        form.setFieldsValue(savedData); // Заполняем форму из черновика
+      } else {
+        form.resetFields();
+      }
     }
-  }, [task, form]);
+  }, [task, visible, form]);
+
+  // Обработчик изменения значений в форме
+  const handleFormValuesChange = (changedValues: any, allValues: any) => {
+    saveFormDataToLocalStorage(allValues); // Сохраняем все данные формы в localStorage
+  };
 
   // Обработчик сохранения задачи
   const handleSave = (values: any) => {
@@ -58,6 +80,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       ...values,
       assigneeId: values.assignee,
     };
+
+    // После сохранения данных на сервере, очищаем localStorage
+    localStorage.removeItem("taskFormData");
 
     // Проверяем, изменился ли только статус задачи
     const isOnlyStatusChanged =
@@ -114,7 +139,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={handleSave}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSave}
+        onValuesChange={handleFormValuesChange} // Слушаем изменения в форме
+      >
         {/* Поле для названия задачи */}
         <Form.Item
           label="Название"
@@ -123,7 +153,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         >
           <Input placeholder="Введите название задачи" />
         </Form.Item>
-
         {/* Поле для описания задачи */}
         <Form.Item
           label="Описание"
@@ -132,14 +161,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         >
           <Input.TextArea placeholder="Введите описание задачи" />
         </Form.Item>
-
         {/* Если есть boardName и boardId, скрываем поле выбора доски и показываем название проекта */}
         {boardName && boardId ? (
           <>
             <Form.Item name="boardId" initialValue={boardId} hidden>
               <Input />
             </Form.Item>
-
             <Form.Item label="Проект">
               <Input value={boardName} disabled />
             </Form.Item>
@@ -163,7 +190,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             </Select>
           </Form.Item>
         )}
-
         {/* Поле для выбора приоритета */}
         <Form.Item
           label="Приоритет"
@@ -176,7 +202,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             <Option value="Low">Low</Option>
           </Select>
         </Form.Item>
-
         {/* Поле для выбора статуса */}
         <Form.Item
           label="Статус"
@@ -189,7 +214,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             <Option value="Done">Done</Option>
           </Select>
         </Form.Item>
-
         {/* Поле для выбора исполнителя */}
         <Form.Item
           label="Исполнитель"
@@ -208,7 +232,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             ))}
           </Select>
         </Form.Item>
-
         {/* Кнопки для перехода на доску и для сохранения задачи */}
         <div className="buttonsContainer">
           {isIssuesPage && task?.boardId && (

@@ -27,6 +27,7 @@
     "react-router-dom": "^7.5.0"
   },
   "devDependencies": {
+    "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-query": "^1.2.8",
@@ -36,9 +37,11 @@
     "html-webpack-plugin": "^5.6.3",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
+    "ts-jest": "^29.3.2",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
+    "util": "^0.12.5",
     "webpack": "^5.99.5",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1",

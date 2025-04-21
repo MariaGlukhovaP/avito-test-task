@@ -7,10 +7,14 @@ export const useUpdateTaskStatus = (taskId: number, boardId: string) => {
 
   return useMutation({
     mutationFn: async (status: string) => {
+      const controller = new AbortController(); // Создаем контроллер для отмены
+      const { signal } = controller; // Получаем сигнал отмены
+
       // Запрос на обновление статуса задачи
       const { data } = await axios.put(
         `http://127.0.0.1:8080/api/v1/tasks/updateStatus/${taskId}`, // URL для обновления статуса задачи
-        { status } // Отправляем новый статус задачи
+        { status }, // Отправляем новый статус задачи
+        { signal } // Передаем сигнал отмены в запрос
       );
       return data; // Возвращаем данные ответа
     },
