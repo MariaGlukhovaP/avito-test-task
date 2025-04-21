@@ -1,10 +1,7 @@
-import { Board } from "../../types/board";
+import { BoardListProps } from "../../types/boardListProps";
 import BoardCard from "../boardCard/boardCard";
 
-interface BoardListProps {
-  boards: Board[];
-}
-
+// Компонент отображает список досок в виде карточек
 const BoardList: React.FC<BoardListProps> = ({ boards }) => {
   return (
     <div className="container">

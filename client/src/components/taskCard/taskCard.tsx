@@ -1,20 +1,19 @@
 import { Card, Tag, Avatar } from "antd";
-import { Issue } from "../../types/issue";
 import { Link, useLocation } from "react-router-dom";
+import { TaskCardProps } from "../../types/taskcardProps";
 
-interface TaskCardProps {
-  task: Issue;
-  onClick?: () => void;
-}
-
+// Карточка задачи с описанием и переходом к доске
 const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
   const location = useLocation();
+
+  // Проверка, находится ли пользователь на странице конкретной доски
   const isOnBoardPage = /^\/board\/\d+$/.test(location.pathname);
 
   return (
     <Card
       key={task.id}
       title={task.title}
+      // Ссылка на доску отображается только вне страницы доски
       extra={
         !isOnBoardPage && (
           <Link to={`/board/${task.boardId}`}>Перейти к доске</Link>
@@ -29,6 +28,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
       </p>
       <p>
         <strong>Приоритет:</strong>
+        {/* Цвет тега в зависимости от приоритета */}
         <Tag
           color={
             task.priority === "High"
@@ -48,6 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
           {task.assignee.fullName}
         </span>
       </p>
+      {/* Название доски отображается, если оно передано */}
       {task.boardName && (
         <p>
           <strong>Доска:</strong> {task.boardName}

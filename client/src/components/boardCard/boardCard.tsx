@@ -1,17 +1,14 @@
 import { Card } from "antd";
 import { NavLink } from "react-router-dom";
-import { Board } from "../../types/board";
+import { BoardCardProps } from "../../types/boardcardProps";
 
-interface BoardCardProps {
-  board: Board;
-}
-
+// Компонент отображает краткую информацию о доске и ссылку для перехода на страницу доски
 const BoardCard: React.FC<BoardCardProps> = ({ board }) => {
   return (
     <Card
       key={board.id}
       title={board.name}
-      extra={<NavLink to={`/board/${board.id}`}>Перейти к доске</NavLink>}
+      extra={<NavLink to={`/board/${board.id}`}>Перейти к доске</NavLink>} // Навигация к конкретной доске по её ID
     >
       <p>{board.description}</p>
       <p>Количество задач: {board.taskCount}</p>

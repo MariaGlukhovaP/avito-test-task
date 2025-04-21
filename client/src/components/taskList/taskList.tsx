@@ -1,29 +1,31 @@
-import { Issue } from "../../types/issue";
+import { Task } from "../../types/task";
 import TaskCard from "../taskCard/taskCard";
 import { useState } from "react";
 import CreateTaskModal from "../taskModal/taskModal";
 import { Button } from "antd";
+import { TaskListProps } from "../../types/taskListProps";
 import "./taskList.css";
-interface TaskListProps {
-  tasks: Issue[];
-}
 
+// Компонент списка задач, отображающий карточки задач и модальное окно для создания/редактирования
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
-  const [selectedTask, setSelectedTask] = useState<Issue | undefined>(
-    undefined
-  );
+  // Состояние выбранной задачи для редактирования
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
+  // Состояние видимости модального окна
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleTaskClick = (task: Issue) => {
+  // Обработчик клика по задаче — открытие модальное окно и установка выбранной задачи
+  const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
     setIsModalVisible(true);
   };
 
+  // Закрытие модальное окно и сброс выбранной задачи
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedTask(undefined);
   };
 
+  // Открытие пустой модальное окнр для создания задачи
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -31,6 +33,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   return (
     <div>
       <div className="container">
+        {/* Отображение списка карточек задач */}
         {tasks.map((task) => (
           <TaskCard
             key={task.id}
@@ -38,6 +41,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
             onClick={() => handleTaskClick(task)}
           />
         ))}
+        {/* Кнопка создания новой задачи и модальное окно */}
         <div className="tasks-button">
           <Button type="primary" onClick={showModal}>
             Создать задачу

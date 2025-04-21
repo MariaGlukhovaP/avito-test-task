@@ -1,35 +1,37 @@
 import { useState } from "react";
-import { Issue } from "../../types/issue";
+import { Task } from "../../types/task";
 import TaskCard from "../taskCard/taskCard";
 import CreateTaskModal from "../taskModal/taskModal";
-import { useTasks } from "../../services/useIssues";
+import { useTasks } from "../../services/useTasks";
+import { BoardColumnProps } from "../../types/boardCardColumnProps";
 import "./board-column.css";
 
-interface BoardColumnProps {
-  title: string;
-  tasks: Issue[];
-  emptyText?: string;
-}
-
+// Колонка задач на доске с заголовком, списком задач и модалкой для редактирования
 const BoardColumn: React.FC<BoardColumnProps> = ({
   title,
   tasks,
   emptyText,
 }) => {
+  // ID выбранной задачи для редактирования
   const [selectedTaskId, setSelectedTaskId] = useState<number | undefined>(
     undefined
   );
+  // Флаг отображения модального окна
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // Получение всех задач (необходимо для поиска выбранной задачи по ID)
   const { data: allTasks } = useTasks();
 
+  // Определение выбранной задачи по её ID
   const selectedTask = allTasks?.find((task) => task.id === selectedTaskId);
 
-  const handleTaskClick = (task: Issue) => {
+  // Обработка клика по задаче — открытие модального окна и установка выбранной задачи
+  const handleTaskClick = (task: Task) => {
     setSelectedTaskId(task.id);
     setIsModalVisible(true);
   };
 
+  // Закрытие модального окна и сброс выбранной задачи
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedTaskId(undefined);

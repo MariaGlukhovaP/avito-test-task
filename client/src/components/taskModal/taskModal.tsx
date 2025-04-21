@@ -1,22 +1,14 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Select, Button } from "antd";
-import { Issue } from "../../types/issue";
 import { useBoards } from "../../services/useBoards";
 import { useUsers } from "../../services/useUsers";
 import { useCreateTask, useUpdateTask } from "../../services/useMutateTask";
 import { useLocation, NavLink } from "react-router-dom";
 import { useUpdateTaskStatus } from "../../services/useUpdateTaskStatus";
+import { CreateTaskModalProps } from "../../types/taskModalProps";
 import "./taskModal.css";
 
 const { Option } = Select;
-
-interface CreateTaskModalProps {
-  visible: boolean;
-  onClose: () => void;
-  task?: Issue;
-  boardName?: string;
-  boardId?: string;
-}
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   visible,
@@ -29,19 +21,21 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const location = useLocation();
   const isIssuesPage = location.pathname === "/issues";
 
+  // Загружаем доски и пользователей для выбора в форме
   const { data: boards = [], isLoading: boardsLoading } = useBoards();
   const { data: users = [], isLoading: usersLoading } = useUsers();
 
+  // Хуки для мутаций: создание, обновление задач и обновление статуса
   const { mutate: createTask, isPending: creating } = useCreateTask();
   const { mutate: updateTask, isPending: updating } = useUpdateTask(
     task?.id ?? 0
   );
-
   const { mutate: updateTaskStatus } = useUpdateTaskStatus(
     task?.id ?? 0,
     String(boardId)
   );
 
+  // Заполняем форму значениями при открытии модального окна для редактирования
   useEffect(() => {
     if (!visible) return;
     if (task) {
@@ -58,12 +52,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     }
   }, [task, form]);
 
+  // Обработчик сохранения задачи
   const handleSave = (values: any) => {
     const payload = {
       ...values,
       assigneeId: values.assignee,
     };
 
+    // Проверяем, изменился ли только статус задачи
     const isOnlyStatusChanged =
       task &&
       values.status !== task.status &&
@@ -75,6 +71,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
     if (task) {
       if (isOnlyStatusChanged) {
+        // Обновляем только статус задачи
         updateTaskStatus(values.status, {
           onSuccess: () => {
             form.resetFields();
@@ -85,6 +82,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           },
         });
       } else {
+        // Обновляем задачу (не только статус)
         updateTask(payload, {
           onSuccess: () => {
             form.resetFields();
@@ -96,6 +94,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         });
       }
     } else {
+      // Создаем новую задачу
       createTask(payload, {
         onSuccess: () => {
           form.resetFields();
@@ -116,6 +115,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       footer={null}
     >
       <Form form={form} layout="vertical" onFinish={handleSave}>
+        {/* Поле для названия задачи */}
         <Form.Item
           label="Название"
           name="title"
@@ -124,6 +124,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <Input placeholder="Введите название задачи" />
         </Form.Item>
 
+        {/* Поле для описания задачи */}
         <Form.Item
           label="Описание"
           name="description"
@@ -132,6 +133,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <Input.TextArea placeholder="Введите описание задачи" />
         </Form.Item>
 
+        {/* Если есть boardName и boardId, скрываем поле выбора доски и показываем название проекта */}
         {boardName && boardId ? (
           <>
             <Form.Item name="boardId" initialValue={boardId} hidden>
@@ -162,6 +164,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </Form.Item>
         )}
 
+        {/* Поле для выбора приоритета */}
         <Form.Item
           label="Приоритет"
           name="priority"
@@ -174,6 +177,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </Select>
         </Form.Item>
 
+        {/* Поле для выбора статуса */}
         <Form.Item
           label="Статус"
           name="status"
@@ -186,6 +190,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </Select>
         </Form.Item>
 
+        {/* Поле для выбора исполнителя */}
         <Form.Item
           label="Исполнитель"
           name="assignee"
@@ -204,6 +209,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </Select>
         </Form.Item>
 
+        {/* Кнопки для перехода на доску и для сохранения задачи */}
         <div className="buttonsContainer">
           {isIssuesPage && task?.boardId && (
             <Form.Item>
