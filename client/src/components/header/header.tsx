@@ -5,7 +5,7 @@ import CreateTaskModal from "../taskModal/taskModal";
 
 interface HeaderProps {
   boardName?: string;
-  boardId?: number;
+  boardId?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ boardName, boardId }) => {

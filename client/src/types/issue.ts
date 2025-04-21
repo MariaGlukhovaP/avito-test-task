@@ -7,6 +7,6 @@ export interface Issue {
   priority: "Low" | "Medium" | "High";
   status: "Backlog" | "InProgress" | "Done";
   assignee: User;
-  boardId: number;
+  boardId: string;
   boardName: string;
 }

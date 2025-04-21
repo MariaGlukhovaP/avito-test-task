@@ -6,7 +6,6 @@ import { useUsers } from "../../services/useUsers";
 import { useCreateTask, useUpdateTask } from "../../services/useMutateTask";
 import { useLocation, NavLink } from "react-router-dom";
 import { useUpdateTaskStatus } from "../../services/useUpdateTaskStatus";
-import { useQueryClient } from "@tanstack/react-query";
 import "./taskModal.css";
 
 const { Option } = Select;
@@ -16,7 +15,7 @@ interface CreateTaskModalProps {
   onClose: () => void;
   task?: Issue;
   boardName?: string;
-  boardId?: number;
+  boardId?: string;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
@@ -26,9 +25,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   boardName,
   boardId,
 }) => {
-  const queryClient = useQueryClient();
-  queryClient.invalidateQueries({ queryKey: ["tasks"] });
-
   const [form] = Form.useForm();
   const location = useLocation();
   const isIssuesPage = location.pathname === "/issues";
@@ -41,7 +37,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     task?.id ?? 0
   );
 
-  const { mutate: updateTaskStatus } = useUpdateTaskStatus(task?.id ?? 0);
+  const { mutate: updateTaskStatus } = useUpdateTaskStatus(
+    task?.id ?? 0,
+    String(boardId)
+  );
 
   useEffect(() => {
     if (!visible) return;

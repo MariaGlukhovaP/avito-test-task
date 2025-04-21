@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface FiltersState {
   status: string;
-  boardId: number | null;
+  boardId: string | null;
   search: string;
 }
 
@@ -19,7 +19,7 @@ const issuesSlice = createSlice({
     setStatus(state, action: PayloadAction<string>) {
       state.status = action.payload;
     },
-    setBoardId(state, action: PayloadAction<number | null>) {
+    setBoardId(state, action: PayloadAction<string | null>) {
       state.boardId = action.payload;
     },
     setSearch(state, action: PayloadAction<string>) {

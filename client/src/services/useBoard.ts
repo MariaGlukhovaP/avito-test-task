@@ -4,7 +4,7 @@ import { Issue } from "../types/issue";
 const fetchBoard = async (id: string): Promise<Issue[]> => {
   const response = await fetch(`http://localhost:8080/api/v1/boards/${id}`);
   const data = await response.json();
-  return data.data; // это массив задач
+  return data.data;
 };
 
 export const useBoard = (id: string) => {

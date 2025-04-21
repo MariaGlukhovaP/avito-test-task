@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-export const useUpdateTaskStatus = (taskId: number) => {
+export const useUpdateTaskStatus = (taskId: number, boardId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -13,7 +13,9 @@ export const useUpdateTaskStatus = (taskId: number) => {
       return data;
     },
     onSuccess: () => {
+      console.log(boardId);
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },
   });
 };

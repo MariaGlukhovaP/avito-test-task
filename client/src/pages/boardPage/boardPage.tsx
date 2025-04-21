@@ -22,7 +22,6 @@ const BoardPage: React.FC = () => {
     isLoading: isTasksLoading,
     isError: isTasksError,
   } = useBoard(id);
-  console.log(boardTasks);
 
   const currentBoard = useMemo(() => {
     return boards?.find((b) => b.id === Number(id));
@@ -38,7 +37,10 @@ const BoardPage: React.FC = () => {
 
   return (
     <div className="container">
-      <Header boardName={currentBoard?.name} boardId={currentBoard?.id} />
+      <Header
+        boardName={currentBoard?.name}
+        boardId={String(currentBoard?.id)}
+      />
 
       {(isBoardsLoading || isTasksLoading) && <p>Загрузка...</p>}
       {(isBoardsError || isTasksError) && <p>Ошибка при загрузке данных</p>}
