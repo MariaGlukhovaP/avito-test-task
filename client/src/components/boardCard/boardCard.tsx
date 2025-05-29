@@ -1,6 +1,6 @@
 import { Card } from "antd";
 import { NavLink } from "react-router-dom";
-import { BoardCardProps } from "../../types/boardcardProps";
+import { BoardCardProps } from "../../types/boardCardProps";
 
 // Компонент отображает краткую информацию о доске и ссылку для перехода на страницу доски
 const BoardCard: React.FC<BoardCardProps> = ({ board }) => {

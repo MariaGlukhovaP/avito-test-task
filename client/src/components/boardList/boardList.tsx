@@ -4,7 +4,7 @@ import BoardCard from "../boardCard/boardCard";
 // Компонент отображает список досок в виде карточек
 const BoardList: React.FC<BoardListProps> = ({ boards }) => {
   return (
-    <div className="container">
+    <div className="container" data-testid="board-list">
       {boards.map((board) => (
         <BoardCard key={board.id} board={board} />
       ))}

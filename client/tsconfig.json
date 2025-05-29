@@ -6,7 +6,9 @@
     "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"]
 }

@@ -1,6 +1,6 @@
 import { Card, Tag, Avatar } from "antd";
 import { Link, useLocation } from "react-router-dom";
-import { TaskCardProps } from "../../types/taskcardProps";
+import { TaskCardProps } from "../../types/taskCardProps";
 
 // Карточка задачи с описанием и переходом к доске
 const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
