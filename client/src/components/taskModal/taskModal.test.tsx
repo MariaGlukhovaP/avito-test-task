@@ -1,16 +1,12 @@
-// В начале тестового файла
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CreateTaskModal from "./taskModal";
 import { MemoryRouter } from "react-router-dom";
 
-// Моки для хуков мутаций
 const mockCreateTask = jest.fn();
 const mockUpdateTask = jest.fn();
 const mockUpdateTaskStatus = jest.fn();
 
-// Мокаем импорт хуков мутаций (путь замени на свой)
 jest.mock("../../services/useMutateTask", () => ({
   useCreateTask: () => ({
     mutate: mockCreateTask,
@@ -28,7 +24,20 @@ jest.mock("../../services/useUpdateTaskStatus", () => ({
   }),
 }));
 
-// Создаём QueryClient
+jest.mock("../../services/useBoards", () => ({
+  useBoards: () => ({
+    data: [{ id: "1", name: "Board One" }],
+    isLoading: false,
+  }),
+}));
+
+jest.mock("../../services/useUsers", () => ({
+  useUsers: () => ({
+    data: [{ id: 1, fullName: "User One" }],
+    isLoading: false,
+  }),
+}));
+
 const createQueryClient = () =>
   new QueryClient({
     defaultOptions: {
@@ -45,7 +54,6 @@ function renderWithClient(ui: React.ReactElement) {
   );
 }
 
-// Тест
 describe("CreateTaskModal", () => {
   beforeEach(() => {
     jest.clearAllMocks();

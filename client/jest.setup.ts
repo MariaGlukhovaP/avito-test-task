@@ -19,3 +19,17 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => false,
   }),
 });
+
+Object.defineProperty(window, "getComputedStyle", {
+  value: (elt: Element, pseudoElt?: string | null): CSSStyleDeclaration => {
+    return {
+      getPropertyValue: (prop: string) => "",
+      ...new Proxy(
+        {},
+        {
+          get: () => () => {},
+        }
+      ),
+    } as CSSStyleDeclaration;
+  },
+});
